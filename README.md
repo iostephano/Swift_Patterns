@@ -6,7 +6,7 @@ Playground de Swift que documenta siete patrones de ingeniería iOS aplicados a 
 
 Este repositorio es material educativo de **SwiftLatam**. No es una aplicación, ni una librería, ni un paquete distribuible.
 
-Cada página del playground toma un problema real del dominio financiero —pagos, saldos, KYC, custodia de tokens— y muestra un patrón que lo resuelve. Todas siguen la misma estructura:
+Cada página del playground toma un problema real del dominio financiero pagos, saldos, KYC, custodia de tokens y muestra un patrón que lo resuelve. Todas siguen la misma estructura:
 
 1. **Problema.** Qué falla si no se aplica el patrón.
 2. **Solución.** Cómo se implementa en Swift.
