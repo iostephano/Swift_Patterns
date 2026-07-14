@@ -1,70 +1,88 @@
 # Swift Patterns
 
-Repositorio de Swift Playground orientado a producción que demuestra patrones
-arquitectónicos reales utilizados en aplicaciones fintech en iOS.
+Playground de Swift que documenta siete patrones de ingeniería iOS aplicados a un dominio fintech simulado, con el detalle de cuándo conviene usarlos y cuándo no.
 
-No es un tutorial básico — es una referencia estructurada para desarrolladores
-intermedios y senior que buscan código limpio, mantenible y escalable.
+## Propósito
 
----
+Este repositorio es material educativo de **SwiftLatam**. No es una aplicación, ni una librería, ni un paquete distribuible.
 
-## ¿Por qué existe este repositorio?
+Cada página del playground toma un problema real del dominio financiero —pagos, saldos, KYC, custodia de tokens— y muestra un patrón que lo resuelve. Todas siguen la misma estructura:
 
-La mayoría del contenido de Swift se enfoca en sintaxis o ejemplos simples.
-Este repositorio se enfoca en decisiones reales de arquitectura:
+1. **Problema.** Qué falla si no se aplica el patrón.
+2. **Solución.** Cómo se implementa en Swift.
+3. **Cuándo usarlo.**
+4. **Cuándo NO usarlo.**
 
-- Precisión en cálculos monetarios
-- Concurrencia segura
-- Servicios desacoplados
-- Almacenamiento seguro
-- Manejo predecible del estado
+El cuarto punto es deliberado. La mayoría del material sobre patrones enseña a aplicarlos; muy poco enseña a reconocer cuándo son sobreingeniería.
 
-El contexto fintech es intencional: aquí la **correctitud es crítica**.
+## Para quién es
 
----
+- Desarrolladores iOS de nivel intermedio y senior.
+- Ingenieros que entran al dominio fintech.
+- Preparación de entrevistas técnicas de arquitectura.
 
-## ¿Para quién es?
+Se asume familiaridad con Swift, protocolos y `async/await`.
 
-- Desarrolladores iOS que quieren subir a nivel senior
-- Ingenieros que entran a fintech
-- Preparación para entrevistas técnicas (arquitectura)
-- Personas construyendo apps de pagos, banca o trading
+## Contenidos
 
----
+| Página | Patrón | Contexto fintech |
+|---|---|---|
+| `LazyLoading` | Carga diferida | Inicialización costosa bajo demanda |
+| `DependencyInjection` | Inyección por protocolos e inicializador | Gateway de pagos, logger y detección de fraude sustituibles |
+| `Modularization` | Fronteras de módulo | Separación de responsabilidades por dominio |
+| `StateManagement` | Estado único, reducer, flujo unidireccional | Ciclo de vida de un pago |
+| `Concurrency` | `actor`, `async let`, `TaskGroup` | Llamadas concurrentes a servicios |
+| `PrecisionHandling` | `Decimal` y redondeo centralizado | Aritmética de dinero sin pérdida de precisión |
+| `SecureStorage` | Keychain y abstracción de almacenamiento | Custodia de tokens de sesión |
 
-## Temas
+## Decisiones técnicas
 
-- Lazy Loading
-- Dependency Injection
-- Modularization
-- State Management
-- Concurrency
-- Precision Handling
-- Secure Storage
+Algunas decisiones del código son intencionales y podrían leerse como descuidos. Están explicadas en comentarios dentro de las páginas correspondientes:
 
----
+**`Decimal`, nunca `Double`, para dinero.** Los valores monetarios se construyen con `Decimal(string:)` y el redondeo pasa por un único punto. `Double` introduce errores de representación inaceptables en aritmética financiera.
 
-## Setup
+**Inyección de dependencias sin contenedor.** Protocolos e inicializadores bastan. No se usa ningún framework de DI de terceros, y la página explica por qué la mayoría de proyectos tampoco lo necesita.
 
-1. Clona el repositorio
-2. Abre `Patterns.playground` en Xcode
-3. Navega por las páginas desde la barra lateral
-4. Revisa la carpeta `Docs/` para teoría
+**`precondition` para el mismatch de moneda.** Sumar soles con dólares es un error de programador, no una condición recuperable. La validación de datos externos pertenece al borde del sistema, antes de construir un `Money`.
 
----
+**Estados imposibles irrepresentables.** `StateManagement` modela el ciclo de un pago con un `enum` y un reducer, de modo que el sistema de tipos impide combinaciones inválidas.
 
-## Nota importante
+**Módulos simulados con `enum`.** Un playground no admite targets separados. La página lo declara explícitamente: en un proyecto real estos serían Swift Packages.
 
-En aplicaciones financieras:
+## Requisitos
 
-- `Double` NO es seguro para dinero
-- Estado compartido NO es seguro en concurrencia
-- Servicios acoplados NO son testeables
+- Xcode <!-- CONFIRMAR VERSIÓN --> o superior.
+- Swift 6 (declarado en el playground).
+- Plataforma destino: iOS.
 
-Este repositorio existe para evitar esos errores.
+## Ejecución
 
----
+1. Clona el repositorio.
+2. Abre `Patterns.playground` en Xcode.
+3. Muestra el navegador de páginas y recorre las siete en cualquier orden. Cada una es autocontenida.
+
+No hay dependencias externas que instalar. No hay `Package.swift`, `Podfile` ni `Cartfile`.
+
+## Estado
+
+Las siete páginas compilan y se ejecutan en Xcode. Verificado adicionalmente con `swiftc -typecheck` bajo `-swift-version 6 -strict-concurrency=complete`, sin errores ni warnings.
+
+El repositorio es material de referencia estable. No está en desarrollo activo.
+
+## Limitaciones conocidas
+
+**No hay pruebas automatizadas.** Los Swift Playgrounds no admiten un target de pruebas nativo. La testabilidad se demuestra conceptualmente mediante *test doubles* (`MockGateway`, `MockLogger`, `MockFraudDetector`), pero ninguna prueba se ejecuta. Validar la lógica pura con XCTest o Swift Testing exigiría extraerla a un Swift Package, lo que cambiaría la naturaleza del repositorio.
+
+**`TokenManager.persist` no es atómico.** Guarda el access token y el refresh token en dos operaciones independientes. Si la segunda falla, queda un estado parcial. La limitación está documentada en el código: un sistema real requeriría compensación o escritura atómica. Se conserva así porque implementar el rollback oscurecería el patrón que la página enseña.
+
+**Los servicios son simulados.** El networking se emula con `Task.sleep`. `KeychainStore` sí usa el Keychain real, con `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`.
+
+**Nunca registres tokens.** El código lo advierte de forma explícita. Los ejemplos imprimen valores solo con fines didácticos, con datos ficticios.
 
 ## Licencia
 
-MIT
+MIT. Ver [LICENSE](LICENSE).
+
+## SwiftLatam
+
+Material educativo de SwiftLatam. Compartido para que otras personas aprendan.
