@@ -2,6 +2,8 @@
 
 Playground de Swift que documenta siete patrones de ingeniería iOS aplicados a un dominio fintech simulado, con el detalle de cuándo conviene usarlos y cuándo no.
 
+<img width="1500" height="500" alt="repositorio" src="https://github.com/user-attachments/assets/a1747323-efd2-4e3e-b2d7-8105ae1fd0b6" />
+
 ## Propósito
 
 Este repositorio es material educativo de **SwiftLatam**. No es una aplicación, ni una librería, ni un paquete distribuible.
